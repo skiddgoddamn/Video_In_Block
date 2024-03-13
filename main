@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <style>
+        .video-background {
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+            left: 0;
+            top: 0;
+            z-index: 9999;
+        }
+
+        .video-background video {
+            margin: 0;
+            padding: 0;
+            left: 0;
+            top: 0;
+            z-index: 9999;
+            object-fit: cover;
+        }
+    </style>
+    <!-- Ссылка на видео -->
+    <div class="video-background">
+        <video id="background-video" autoplay muted loop playsinline>
+            <source
+                src="YOUR_VIDEOLINK.mp4"
+                type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        // Функция изменения размера и расположения видео
+        function changevideo() {
+            var image = getImage(window.innerWidth)
+            var OffsetLeft = image.OffsetLeft;
+            var OffsetTop = image.OffsetTop;
+            var width = image.width;
+            var height = image.height;
+            var video = document.querySelector('.video-background video');
+            video.style.height = height + 'px';
+            video.style.width = width + 'px';
+            video.style.left = OffsetLeft + 'px';
+            video.style.top = OffsetTop + 'px';
+        }
+        // Функция получения фото по которому будет изменяться размер видео
+        // в соответствии с рамзером экрана выбирается определенное фото
+        function getImage(screenWidth) {
+            if (screenWidth <= 960) {
+                return document.querySelector('.tn-atom img[imgfield="tn_img_1709728536673"]');
+            } else {
+                return document.querySelector('.tn-atom img[imgfield="tn_img_1709721008973"]');
+            }
+            return null;
+        }
+        // Функция запускается после загрузки и запускает eventListeners 
+        function onPageLoad() {
+            var image = getImage(window.innerWidth)
+            image.addEventListener('load', function () {//слушатель для выполнения действия после загрузки фото
+                setInterval(function () {
+                    changevideo();
+                }, 1000);
+            });
+            window.addEventListener('orientationchange', function () {//слушатель для выполнения действия после изменения орриентации экрана
+                setInterval(function () {
+                    changevideo();
+                }, 1000);
+            });
+            window.addEventListener('resize', function () {//слушатель для выполнения действия после изменения размера экрана
+                setInterval(function () {
+                    changevideo();
+                }, 1000);
+            });
+
+            clickEvent()
+        }
+        function clickEvent() {//функция для выполняющее действия после клика 
+
+            var elementToToggle = document.querySelector('.tn-atom img[imgfield="tn_img_1709721008979"]');
+            var elementToToggle1 = document.querySelector('.tn-atom[field="tn_text_1709721008977"]');
+            var video = document.getElementById('background-video');
+
+            var myButton = document.querySelector('.tn-atom img[imgfield="tn_img_1709721008981"]');
+
+            myButton.addEventListener('click', function () {//запускаем слушатель ивента клика
+                var remaining = 0;
+                if (elementToToggle.style.display === 'none' && elementToToggle1.style.display === 'none' && !video.muted) {
+                    showObject(elementToToggle);//если эелементы уже скрыты, то показываем
+                    showObject(elementToToggle1);
+                    video.muted = true;
+                } else {
+                    hideObject(elementToToggle);//если эелементы не скрыты, скрываем
+                    hideObject(elementToToggle1);
+                    video.muted = false;
+                }
+            });
+        }
+        function hideObject(obj) {//функция скрытия элементов
+            var opacity = 1;
+            var interval = setInterval(function () {
+                opacity -= 0.01;
+                changeOpacity(obj, opacity); //устанавливаем прозрачность
+                if (opacity <= 0) { //постепенно добавляем прозрачность, пока элемент не пропадет
+                    clearInterval(interval);
+                    obj.style.display = 'none';//скрываем элемент после того как прозраность стала минимальной
+                }
+            }, 10);
+        }
+
+        function showObject(obj) {//функция показа элементов
+            obj.style.display = 'block'; //показываем эелемент
+            var opacity = 0;
+            changeOpacity(obj, opacity);//устанавливаем прозрачность 0
+            var interval = setInterval(function () {
+                opacity += 0.01;
+                changeOpacity(obj, opacity); //устанавливаем прозрачность
+                if (opacity >= 1) { //постепенно убираем прозрачность, пока элемент не проявится
+                    clearInterval(interval);
+                }
+            }, 10);
+        }
+        function changeOpacity(obj, value) {//функция изменения прозрачности объекта
+            obj.style.opacity = value;
+        }
+        // Добавляем обработчик события полной загрузки страницы
+        document.addEventListener('DOMContentLoaded', onPageLoad);
+    </script>
+</body>
+
+</html>
